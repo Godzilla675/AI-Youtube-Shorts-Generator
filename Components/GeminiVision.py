@@ -37,6 +37,7 @@ def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
     Returns:
         Tuple of (start_time, end_time) for the highlight
     """
+    video_file = None
     try:
         print(f"Uploading video for analysis with {model_name}...")
         
@@ -114,9 +115,6 @@ def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
                 print("Warning: Segment is longer than 60 seconds, truncating...")
                 end = start + 60
             
-            # Clean up the uploaded file
-            genai.delete_file(video_file.name)
-            
             return int(start), int(end)
         else:
             raise ValueError("Could not parse JSON response from Gemini")
@@ -131,6 +129,15 @@ def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
             return GetHighlightFromVideo(video_path, model_name)
         
         raise e
+    
+    finally:
+        # Always clean up the uploaded file
+        if video_file:
+            try:
+                genai.delete_file(video_file.name)
+                print("Cleaned up uploaded video file")
+            except:
+                pass  # Ignore cleanup errors
 
 if __name__ == "__main__":
     # Test the function
