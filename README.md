@@ -1,6 +1,6 @@
 # AI Youtube Shorts Generator
 FIXED VERSION
-AI Youtube Shorts Generator is a Python tool designed to generate engaging YouTube shorts from long-form videos. By leveraging the power of GPT-4 and Whisper, it extracts the most interesting highlights, detects speakers, and crops the content vertically for shorts. This tool is currently in version 0.1 and might have some bugs.
+AI Youtube Shorts Generator is a Python tool designed to generate engaging YouTube shorts from long-form videos. By leveraging the power of GPT-4, Gemini 2.0 Flash, and Whisper, it extracts the most interesting highlights, detects speakers, and crops the content vertically for shorts. This tool supports multiple AI models and two analysis modes for maximum flexibility.
 
 If you wish to add shorts generation into your application, here is an api to create shorts from long form videos :- https://docs.vadoo.tv/docs/guide/create-ai-clips
 
@@ -9,8 +9,11 @@ If you wish to add shorts generation into your application, here is an api to cr
 ## Features
 
 - **Video Download**: Given a YouTube URL, the tool downloads the video.
-- **Transcription**: Uses Whisper to transcribe the video.
-- **Highlight Extraction**: Utilizes OpenAI's GPT-4 to identify the most engaging parts of the video.
+- **Dual Analysis Modes**:
+  - **Transcript Mode**: Transcribes audio with Whisper, then analyzes with AI (supports GPT-4o and Gemini models)
+  - **Vision Mode**: AI watches and hears the video directly using Gemini's multimodal capabilities (no transcription needed)
+- **Multiple AI Models**: Choose from GPT-4o, Gemini 2.0 Flash, Gemini 1.5 Flash, or Gemini 1.5 Pro
+- **Highlight Extraction**: Automatically identifies the most engaging parts of the video for shorts.
 - **Speaker Detection**: Detects speakers in the video.
 - **Vertical Cropping**: Crops the highlighted sections vertically, making them perfect for shorts.
 
@@ -52,19 +55,38 @@ pip install -r requirements.txt
 
 1. Set up the environment variables.
 
-Create a `.env` file in the project root directory and add your OpenAI API key:
+Create a `.env` file in the project root directory and add your API keys:
 
 ```bash
+# For GPT-4o (Transcript Mode)
 OPENAI_API=your_openai_api_key_here
+
+# For Gemini models (both modes)
+GEMINI_API=your_gemini_api_key_here
 ```
+
+You can get a Gemini API key for free at: https://makersuite.google.com/app/apikey
 
 ## Usage
 
-1. Ensure your `.env` file is correctly set up with your OpenAI API key.
-2. Run the main script and enter the desired YouTube URL when prompted:
+1. Ensure your `.env` file is correctly set up with your API keys.
+2. Run the main script:
    ```bash
    python main.py
    ```
+3. Choose your analysis mode:
+   - **Mode 1 (Transcript Mode)**: Traditional approach - transcribes audio first, then AI analyzes the transcript
+     - Supports: GPT-4o, Gemini 2.0 Flash, Gemini 1.5 Flash, Gemini 1.5 Pro
+   - **Mode 2 (Vision Mode)**: Advanced approach - Gemini watches and hears the video directly
+     - Supports: Gemini 2.0 Flash, Gemini 1.5 Flash, Gemini 1.5 Pro (GPT models can't analyze videos)
+4. Select your preferred AI model from the available options
+5. Enter the YouTube URL when prompted
+6. The tool will generate a vertical short saved as `Final.mp4`
+
+### Which Mode Should You Use?
+
+- **Transcript Mode**: Faster, cheaper, good for videos with clear speech
+- **Vision Mode**: More accurate for visual content, understands context from both audio and video, better for videos where visuals are important
 
 ## Contributing
 
