@@ -103,7 +103,7 @@ def main():
             return
     
     # Process the highlight
-    if start and stop and start > 0 and stop > 0 and stop > start:
+    if start is not None and stop is not None and start >= 0 and stop > 0 and stop > start:
         print(f"\n✓ Highlight identified: {start}s - {stop}s (duration: {stop-start}s)")
         
         Output = "Out.mp4"
