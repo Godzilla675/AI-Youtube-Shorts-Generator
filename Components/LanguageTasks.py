@@ -52,13 +52,13 @@ IF YOU DONT HAVE ONE start AND end WHICH IS FOR THE LENGTH OF THE ENTIRE HIGHLIG
 
 
 
-def GetHighlight(Transcription, model="gpt-4o"):
+def GetHighlight(Transcription, model="gemini-2.5-flash-002"):
     """
     Get highlight from transcription using various AI models.
     
     Args:
         Transcription: The video transcript text
-        model: Model to use - "gpt-4o", "gemini-2.0-flash-exp", "gemini-1.5-flash", "gemini-1.5-pro"
+        model: Model to use - "gpt-4o", "gemini-2.5-flash-002", "gemini-2.5-pro-002", "gemini-1.5-flash", "gemini-1.5-pro"
     
     Returns:
         Tuple of (start_time, end_time)
@@ -72,10 +72,20 @@ def GetHighlight(Transcription, model="gpt-4o"):
         
         from langchain_google_genai import ChatGoogleGenerativeAI
         
+        # Configure with thinking mode for 2.5 models
+        model_kwargs = {}
+        if "2.5" in model or "2-5" in model:
+            print("Using Gemini 2.5 with thinking mode enabled...")
+            model_kwargs = {
+                "max_output_tokens": 8192,
+                "thinking": True
+            }
+        
         llm = ChatGoogleGenerativeAI(
             model=model,
             temperature=0.7,
-            google_api_key=gemini_api_key
+            google_api_key=gemini_api_key,
+            **model_kwargs
         )
     else:  # OpenAI models (gpt-4o, gpt-4, etc.)
         if not openai_api_key:

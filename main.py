@@ -17,36 +17,40 @@ def print_menu():
 def select_transcript_model():
     print("\nSelect AI Model for Transcript Analysis:")
     print("1. GPT-4o (OpenAI) - Default")
-    print("2. Gemini 2.0 Flash Experimental (Google)")
-    print("3. Gemini 1.5 Flash (Google)")
-    print("4. Gemini 1.5 Pro (Google)")
+    print("2. Gemini 2.5 Flash (Google) - Latest with thinking mode")
+    print("3. Gemini 2.5 Pro (Google) - Most capable with thinking mode")
+    print("4. Gemini 1.5 Flash (Google) - Fast and efficient")
+    print("5. Gemini 1.5 Pro (Google) - Capable and reliable")
+    
+    choice = input("\nEnter choice (1-5, default=2): ").strip() or "2"
+    
+    models = {
+        "1": "gpt-4o",
+        "2": "gemini-2.5-flash-002",
+        "3": "gemini-2.5-pro-002",
+        "4": "gemini-1.5-flash",
+        "5": "gemini-1.5-pro"
+    }
+    
+    return models.get(choice, "gemini-2.5-flash-002")
+
+def select_vision_model():
+    print("\nSelect Gemini Model for Vision Analysis:")
+    print("1. Gemini 2.5 Flash - Latest with thinking mode (Recommended)")
+    print("2. Gemini 2.5 Pro - Most capable with thinking mode")
+    print("3. Gemini 1.5 Flash - Fast and efficient")
+    print("4. Gemini 1.5 Pro - Capable and reliable")
     
     choice = input("\nEnter choice (1-4, default=1): ").strip() or "1"
     
     models = {
-        "1": "gpt-4o",
-        "2": "gemini-2.0-flash-exp",
+        "1": "gemini-2.5-flash-002",
+        "2": "gemini-2.5-pro-002",
         "3": "gemini-1.5-flash",
         "4": "gemini-1.5-pro"
     }
     
-    return models.get(choice, "gpt-4o")
-
-def select_vision_model():
-    print("\nSelect Gemini Model for Vision Analysis:")
-    print("1. Gemini 2.0 Flash Experimental - Latest and fastest")
-    print("2. Gemini 1.5 Flash - Fast and efficient")
-    print("3. Gemini 1.5 Pro - Most capable")
-    
-    choice = input("\nEnter choice (1-3, default=1): ").strip() or "1"
-    
-    models = {
-        "1": "gemini-2.0-flash-exp",
-        "2": "gemini-1.5-flash",
-        "3": "gemini-1.5-pro"
-    }
-    
-    return models.get(choice, "gemini-2.0-flash-exp")
+    return models.get(choice, "gemini-2.5-flash-002")
 
 def main():
     print_menu()

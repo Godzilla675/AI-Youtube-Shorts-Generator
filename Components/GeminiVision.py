@@ -26,13 +26,13 @@ class VideoHighlight(BaseModel):
     content: str = Field(description="Highlight Text describing the interesting part")
     end: float = Field(description="End time for the highlighted clip in seconds")
 
-def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
+def GetHighlightFromVideo(video_path, model_name="gemini-2.5-flash-002"):
     """
     Analyze video directly using Gemini's vision capabilities to find highlights.
     
     Args:
         video_path: Path to the video file
-        model_name: Gemini model to use (gemini-2.0-flash-exp, gemini-1.5-flash, or gemini-1.5-pro)
+        model_name: Gemini model to use (gemini-2.5-flash-002, gemini-2.5-pro-002, gemini-1.5-flash, or gemini-1.5-pro)
     
     Returns:
         Tuple of (start_time, end_time) for the highlight
@@ -53,10 +53,27 @@ def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
         if video_file.state.name == "FAILED":
             raise ValueError("Video processing failed")
         
-        print("Video processed successfully. Analyzing content...")
+        print("Video processed successfully. Analyzing content with thinking mode enabled...")
         
-        # Create the model
-        model = genai.GenerativeModel(model_name=model_name)
+        # Configure generation with thinking mode and max tokens
+        generation_config = genai.GenerationConfig(
+            temperature=0.7,
+            max_output_tokens=8192,
+            response_mime_type="application/json",
+        )
+        
+        # Create the model with thinking mode enabled for 2.5 models
+        if "2.5" in model_name or "2-5" in model_name:
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                generation_config=generation_config,
+                system_instruction="You are an expert video analyst specializing in identifying engaging content for short-form videos. Think deeply about the visual and audio elements before providing your analysis."
+            )
+        else:
+            model = genai.GenerativeModel(
+                model_name=model_name,
+                generation_config=generation_config
+            )
         
         # Create the prompt for highlight extraction
         prompt = """
@@ -84,7 +101,7 @@ def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
         Return ONLY the JSON, no other text.
         """
         
-        # Generate content
+        # Generate content with thinking mode
         response = model.generate_content([video_file, prompt])
         
         # Parse the response
@@ -142,7 +159,7 @@ def GetHighlightFromVideo(video_path, model_name="gemini-2.0-flash-exp"):
 if __name__ == "__main__":
     # Test the function
     test_video = input("Enter path to test video: ")
-    model = input("Enter model (gemini-2.0-flash-exp/gemini-1.5-flash/gemini-1.5-pro): ") or "gemini-2.0-flash-exp"
+    model = input("Enter model (gemini-2.5-flash-002/gemini-2.5-pro-002/gemini-1.5-flash/gemini-1.5-pro): ") or "gemini-2.5-flash-002"
     
     start, end = GetHighlightFromVideo(test_video, model)
     print(f"\nFinal result: Start={start}, End={end}")
