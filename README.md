@@ -65,7 +65,11 @@ OPENAI_API=your_openai_api_key_here
 GEMINI_API=your_gemini_api_key_here
 ```
 
-You can get a Gemini API key for free at: https://makersuite.google.com/app/apikey
+**Getting API Keys:**
+- OpenAI API: https://platform.openai.com/api-keys (requires payment)
+- Gemini API: https://makersuite.google.com/app/apikey (free tier available)
+
+**Note:** You only need the API key for the models you plan to use. If you only want to use Gemini models, you don't need an OpenAI API key.
 
 ## Usage
 
@@ -87,6 +91,19 @@ You can get a Gemini API key for free at: https://makersuite.google.com/app/apik
 
 - **Transcript Mode**: Faster, cheaper, good for videos with clear speech
 - **Vision Mode**: More accurate for visual content, understands context from both audio and video, better for videos where visuals are important
+
+### Model Comparison
+
+**Transcript Mode Models:**
+- **GPT-4o**: Most capable, best for complex content, requires OpenAI API (paid)
+- **Gemini 2.0 Flash**: Latest, fastest, good balance of speed and quality, free tier available
+- **Gemini 1.5 Flash**: Fast and efficient, good for most use cases, free tier available
+- **Gemini 1.5 Pro**: Most capable Gemini model, best for complex analysis, free tier available
+
+**Vision Mode Models (Gemini only):**
+- **Gemini 2.0 Flash**: Recommended for most users - fastest, latest features
+- **Gemini 1.5 Flash**: Good for basic video analysis
+- **Gemini 1.5 Pro**: Best for detailed video understanding, slower but more thorough
 
 ## Contributing
 
