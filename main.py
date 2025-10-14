@@ -2,41 +2,130 @@ from Components.YoutubeDownloader import download_youtube_video
 from Components.Edit import extractAudio, crop_video
 from Components.Transcription import transcribeAudio
 from Components.LanguageTasks import GetHighlight
+from Components.GeminiVision import GetHighlightFromVideo
 from Components.FaceCrop import crop_to_vertical, combine_videos
 
-url = input("Enter YouTube video URL: ")
-Vid= download_youtube_video(url)
-if Vid:
+def print_menu():
+    print("\n" + "="*60)
+    print("AI YouTube Shorts Generator")
+    print("="*60)
+    print("\nSelect Analysis Mode:")
+    print("1. Transcript Mode (Original) - Transcribe audio, then analyze with AI")
+    print("2. Vision Mode - AI watches and hears the video directly (Gemini only)")
+    print("="*60)
+
+def select_transcript_model():
+    print("\nSelect AI Model for Transcript Analysis:")
+    print("1. GPT-4o (OpenAI) - Default")
+    print("2. Gemini 2.5 Flash (Google) - Latest with thinking mode")
+    print("3. Gemini 2.5 Pro (Google) - Most capable with thinking mode")
+    print("4. Gemini 1.5 Flash (Google) - Fast and efficient")
+    print("5. Gemini 1.5 Pro (Google) - Capable and reliable")
+    
+    choice = input("\nEnter choice (1-5, default=2): ").strip() or "2"
+    
+    models = {
+        "1": "gpt-4o",
+        "2": "gemini-2.5-flash-002",
+        "3": "gemini-2.5-pro-002",
+        "4": "gemini-1.5-flash",
+        "5": "gemini-1.5-pro"
+    }
+    
+    return models.get(choice, "gemini-2.5-flash-002")
+
+def select_vision_model():
+    print("\nSelect Gemini Model for Vision Analysis:")
+    print("1. Gemini 2.5 Flash - Latest with thinking mode (Recommended)")
+    print("2. Gemini 2.5 Pro - Most capable with thinking mode")
+    print("3. Gemini 1.5 Flash - Fast and efficient")
+    print("4. Gemini 1.5 Pro - Capable and reliable")
+    
+    choice = input("\nEnter choice (1-4, default=1): ").strip() or "1"
+    
+    models = {
+        "1": "gemini-2.5-flash-002",
+        "2": "gemini-2.5-pro-002",
+        "3": "gemini-1.5-flash",
+        "4": "gemini-1.5-pro"
+    }
+    
+    return models.get(choice, "gemini-2.5-flash-002")
+
+def main():
+    print_menu()
+    
+    mode = input("\nEnter mode (1 or 2, default=1): ").strip() or "1"
+    
+    url = input("\nEnter YouTube video URL: ")
+    Vid = download_youtube_video(url)
+    
+    if not Vid:
+        print("Unable to Download the video")
+        return
+    
     Vid = Vid.replace(".webm", ".mp4")
     print(f"Downloaded video and audio files successfully! at {Vid}")
-
-    Audio = extractAudio(Vid)
-    if Audio:
-
-        transcriptions = transcribeAudio(Audio)
-        if len(transcriptions) > 0:
-            TransText = ""
-
-            for text, start, end in transcriptions:
-                TransText += (f"{start} - {end}: {text}")
-
-            start , stop = GetHighlight(TransText)
-            #handle the case when the highlight starts from 0s
-            if start>0 and stop>0 and stop>start:
-                print(f"Start: {start} , End: {stop}")
-
-                Output = "Out.mp4"
-
-                crop_video(Vid, Output, start, stop)
-                croped = "croped.mp4"
-
-                crop_to_vertical("Out.mp4", croped)
-                combine_videos("Out.mp4", croped, "Final.mp4")
-            else:
-                print("Error in getting highlight")
-        else:
-            print("No transcriptions found")
+    
+    start = None
+    stop = None
+    
+    if mode == "2":
+        # Vision Mode - Gemini watches the video directly
+        print("\n--- Vision Mode: AI will watch and analyze the video directly ---")
+        model = select_vision_model()
+        
+        try:
+            start, stop = GetHighlightFromVideo(Vid, model)
+        except Exception as e:
+            print(f"Error in vision mode: {e}")
+            return
+    
     else:
-        print("No audio file found")
-else:
-    print("Unable to Download the video")
+        # Transcript Mode - Traditional approach
+        print("\n--- Transcript Mode: Transcribing audio first ---")
+        model = select_transcript_model()
+        
+        Audio = extractAudio(Vid)
+        if not Audio:
+            print("No audio file found")
+            return
+        
+        transcriptions = transcribeAudio(Audio)
+        if len(transcriptions) == 0:
+            print("No transcriptions found")
+            return
+        
+        TransText = ""
+        for text, time_start, time_end in transcriptions:
+            TransText += (f"{time_start} - {time_end}: {text}")
+        
+        try:
+            start, stop = GetHighlight(TransText, model)
+        except Exception as e:
+            print(f"Error in transcript mode: {e}")
+            return
+    
+    # Process the highlight
+    if start is not None and stop is not None and start >= 0 and stop > 0 and stop > start:
+        print(f"\n✓ Highlight identified: {start}s - {stop}s (duration: {stop-start}s)")
+        
+        Output = "Out.mp4"
+        print("\nCropping video to highlight...")
+        crop_video(Vid, Output, start, stop)
+        
+        croped = "croped.mp4"
+        print("Creating vertical format...")
+        crop_to_vertical("Out.mp4", croped)
+        
+        print("Combining videos...")
+        combine_videos("Out.mp4", croped, "Final.mp4")
+        
+        print("\n" + "="*60)
+        print("✓ SUCCESS! Your short has been created: Final.mp4")
+        print("="*60)
+    else:
+        print("Error in getting highlight")
+
+if __name__ == "__main__":
+    main()
